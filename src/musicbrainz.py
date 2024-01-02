@@ -9,7 +9,7 @@ class Brainz:
     """handler"""
 
     API_BASE = "https://musicbrainz.org/ws/2"
-    API_TAIL = "fmt=json&limit=1"
+    API_TAIL = "fmt=json"
 
     def make_request(self, query: str) -> dict:
         """make request to API"""
@@ -25,7 +25,7 @@ class Brainz:
         """get release id"""
         album = self._make_album_request(artist, album_name)
         if not album:
-            artist = input("artist: ")
+            artist = input("artist: ").strip()
 
         album = self._make_album_request(artist, album_name)
 
@@ -37,11 +37,19 @@ class Brainz:
     def _make_album_request(self, artist: str, album_name: str) -> AlbumType | None:
         """get release id"""
         query = f"release?query=artist:{artist},release:{album_name}"
-
         response = self.make_request(query)
-        release = response["releases"][0]
 
-        if not artist in [i["name"] for i in release["artist-credit"]]:
+        release = next(
+            (
+                release_match
+                for release_match in response["releases"]
+                if album_name == release_match["title"]
+                and artist in (i["name"] for i in release_match["artist-credit"])
+            ),
+            None,
+        )
+
+        if not release:
             return None
 
         album: AlbumType = {
@@ -58,7 +66,7 @@ class Brainz:
     def get_track_list(self, album: AlbumType) -> list[TrackType]:
         """get list of tracks in release"""
         release_id = album["album_id"]
-        query = f"release/{release_id}?inc=recordings"
+        query = f"release/{release_id}?inc=recordings&limit=1"
         response = self.make_request(query)
         tracks = response["media"][0]["tracks"]
 
