@@ -28,10 +28,10 @@ pip install --upgrade -r requirements.txt
 ```
 
 ## Run
-Pass the Playlist ID (just the Playlist ID) as a first argument to `main.py`, e.g.:
+Pass the Playlist ID or URL with a `list` query parameter as a first argument to `main.py`, e.g.:
 
 ```
-main.py <playlist-id>
+main.py <playlist-id> | <url>
 ```
 
 This uses the free [musicbrainz.org](https://musicbrainz.org) API to validate and gather metadata information.
