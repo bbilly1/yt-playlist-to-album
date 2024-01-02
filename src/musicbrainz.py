@@ -70,6 +70,7 @@ class Brainz:
                 "track_nr": track_data["position"],
                 "album": album,
                 "youtube_id": None,
+                "track_id": track_data["id"],
             }
             track_list.append(track)
 
