@@ -1,7 +1,5 @@
 """download tracks"""
 
-import os
-
 import requests
 import yt_dlp
 from mutagen.easyid3 import EasyID3
@@ -31,15 +29,16 @@ class Tracks:
 
     def download_single(self, track: TrackType) -> str:
         """download single video"""
-        folder = f"{track['album'].get('artist')}/{track['album'].get('name')}"
+        artist = self._str_cleaner(track["album"]["artist"])
+        album = self._str_cleaner(track["album"]["name"])
         track_nr = str(track.get("track_nr")).zfill(2)
-        template = f"{folder}/{track_nr} - {track['title']}.%(ext)s"
+        title = self._str_cleaner(track["title"])
+        template = f"{artist}/{album}/{track_nr} - {title}"
         yt_obs = {
             "format": "bestaudio/best",
             "extractaudio": True,
             "audioformat": "mp3",
             "outtmpl": template,
-            "windowsfilenames": True,
             "postprocessors": [{
                 "key": "FFmpegExtractAudio",
                 "preferredcodec": "mp3",
@@ -47,9 +46,17 @@ class Tracks:
             }],
         }
         yt_dlp.YoutubeDL(yt_obs).download(track.get("youtube_id"))
-        file_path = [i for i in os.listdir(folder) if i.startswith(track_nr)][0]
 
-        return os.path.join(folder, file_path)
+        return f"{template}.mp3"
+
+    @staticmethod
+    def _str_cleaner(input_string) -> str:
+        """clean string for filesystem"""
+        invalid_chars = ["/", "%", ":", "\\", "|", "<", ">", "?", "*"]
+        cleaned_string = "".join(
+            [char for char in input_string if char not in invalid_chars]
+        )
+        return cleaned_string
 
     def write_metadata(self, track: TrackType, audio_path: str) -> None:
         """write metadata to track"""
