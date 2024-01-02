@@ -34,4 +34,6 @@ Pass the Playlist ID (just the Playlist ID) as a first argument to `main.py`, e.
 main.py <playlist-id>
 ```
 
-You will get prompted to enter the `Artist` and `Year`, the playlist title will become the Album, track title will be the video title, cover art will be the video thumbnail of the first video in the playlist.
+This uses the free [musicbrainz.org](https://musicbrainz.org) API to validate and gather metadata information.
+
+When in doubt, you'll get prompted to manually enter the `Artist` name, the playlist title will become the Album, track title will be the video title, cover art will be the video thumbnail of the first video in the playlist.
