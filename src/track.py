@@ -33,7 +33,7 @@ class Tracks:
         """download single video"""
         folder = f"{track['album'].get('artist')}/{track['album'].get('name')}"
         track_nr = str(track.get("track_nr")).zfill(2)
-        template = f"{folder}/{track_nr} - %(title)s.%(ext)s"
+        template = f"{folder}/{track_nr} - {track['title']}.%(ext)s"
         yt_obs = {
             "format": "bestaudio/best",
             "extractaudio": True,

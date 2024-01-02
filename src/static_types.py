@@ -10,7 +10,8 @@ class AlbumType(TypedDict):
     name: str
     year: str
     total_tracks: int
-    cover_art: str
+    cover_art: str | None
+    album_id: str
 
 
 class TrackType(TypedDict):
@@ -18,5 +19,5 @@ class TrackType(TypedDict):
 
     title: str
     track_nr: int
-    video_id: str
+    video_id: str | None
     album: AlbumType

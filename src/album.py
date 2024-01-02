@@ -1,7 +1,10 @@
 """extract album metadata"""
 
+from difflib import SequenceMatcher
+
 import requests
 import yt_dlp
+from src.musicbrainz import Brainz
 from src.static_types import AlbumType, TrackType
 
 
@@ -14,13 +17,13 @@ class Album:
 
     def get_tracklist(self) -> list[TrackType]:
         """build list of tracks in album"""
-        self.get_metadata()
+        self.get_yt_metadata()
         album: AlbumType = self.get_album()
         track_list: list[TrackType] = self.build_tracks(album)
 
         return track_list
 
-    def get_metadata(self) -> None:
+    def get_yt_metadata(self) -> None:
         """get yt metadata"""
         yt_obs = {
             "skip_download": True,
@@ -32,21 +35,19 @@ class Album:
         self.response = yt_dlp.YoutubeDL(yt_obs).extract_info(url)
 
     def get_album(self) -> AlbumType:
-        """build album"""
+        """identify album from playlist"""
         if self.response.get("channel"):
             artist = self.response["channel"]
         else:
-            artist = input("artist: ")
+            artist = self.response["entries"][0]["channel"]
 
-        year = input("year: ")
-
-        album: AlbumType = {
-            "artist": artist,
-            "name": self.response["title"],
-            "year": year,
-            "total_tracks": len(self.response["entries"]),
-            "cover_art": self.get_thumbnail(self.response),
-        }
+        album_name = self.response["title"]
+        album: AlbumType = Brainz().get_release_id(artist, album_name)
+        album.update(
+            {
+                "cover_art": self.get_thumbnail(self.response)
+            }
+        )
 
         return album
 
@@ -65,15 +66,27 @@ class Album:
     def build_tracks(self, album: AlbumType) -> list[TrackType]:
         """build album tracks"""
 
-        track_list: list[TrackType] = []
+        track_list: list[TrackType] = Brainz().get_track_list(album)
+        entries = [(i["title"], i["id"]) for i in self.response["entries"]]
 
-        for idx, entry in enumerate(self.response["entries"]):
-            track: TrackType = {
-                "title": entry["title"],
-                "track_nr": idx + 1,
-                "video_id": entry["id"],
-                "album": album,
-            }
-            track_list.append(track)
+        for track in track_list:
+            video_id = self.find_best_match_id(entries, track["title"])
+            track.update({"video_id": video_id})
 
         return track_list
+
+    @staticmethod
+    def find_best_match_id(entries, search_title):
+        """find id"""
+        best_match_id = None
+        best_match_ratio = 0
+
+        for title, video_id in entries:
+            current_ratio = SequenceMatcher(
+                None, search_title.lower(), title.lower()
+            ).ratio()
+            if current_ratio > best_match_ratio:
+                best_match_id = video_id
+                best_match_ratio = current_ratio
+
+        return best_match_id
