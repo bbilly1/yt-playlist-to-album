@@ -46,7 +46,7 @@ class Tracks:
                 "preferredquality": "192",
             }],
         }
-        yt_dlp.YoutubeDL(yt_obs).download(track.get("video_id"))
+        yt_dlp.YoutubeDL(yt_obs).download(track.get("youtube_id"))
         file_path = [i for i in os.listdir(folder) if i.startswith(track_nr)][0]
 
         return os.path.join(folder, file_path)

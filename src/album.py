@@ -70,8 +70,8 @@ class Album:
         entries = [(i["title"], i["id"]) for i in self.response["entries"]]
 
         for track in track_list:
-            video_id = self.find_best_match_id(entries, track["title"])
-            track.update({"video_id": video_id})
+            youtube_id = self.find_best_match_id(entries, track["title"])
+            track.update({"youtube_id": youtube_id})
 
         return track_list
 
@@ -81,12 +81,12 @@ class Album:
         best_match_id = None
         best_match_ratio = 0
 
-        for title, video_id in entries:
+        for title, youtube_id in entries:
             current_ratio = SequenceMatcher(
                 None, search_title.lower(), title.lower()
             ).ratio()
             if current_ratio > best_match_ratio:
-                best_match_id = video_id
+                best_match_id = youtube_id
                 best_match_ratio = current_ratio
 
         return best_match_id

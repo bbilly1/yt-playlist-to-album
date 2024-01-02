@@ -19,5 +19,5 @@ class TrackType(TypedDict):
 
     title: str
     track_nr: int
-    video_id: str | None
+    youtube_id: str | None
     album: AlbumType
