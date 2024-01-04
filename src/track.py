@@ -38,6 +38,7 @@ class Tracks:
             "format": "bestaudio/best",
             "extractaudio": True,
             "audioformat": "mp3",
+            "final_ext": "mp3",
             "outtmpl": template,
             "postprocessors": [{
                 "key": "FFmpegExtractAudio",
