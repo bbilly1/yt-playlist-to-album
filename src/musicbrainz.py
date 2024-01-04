@@ -45,6 +45,7 @@ class Brainz:
                 for release_match in response["releases"]
                 if album_name == release_match["title"]
                 and artist in (i["name"] for i in release_match["artist-credit"])
+                and "date" in release_match.keys()
             ),
             None,
         )
