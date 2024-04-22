@@ -39,30 +39,27 @@ class Brainz:
         query = f"release?query=artist:{artist},release:{album_name}"
         response = self.make_request(query)
 
-        release = next(
-            (
-                release_match
-                for release_match in response["releases"]
-                if album_name == release_match["title"]
-                and artist in (i["name"] for i in release_match["artist-credit"])
-                and "date" in release_match.keys()
-            ),
-            None,
-        )
+        for release in response["releases"]:
+            if not "date" in release:
+                continue
+            if not album_name.lower() == release["title"].lower():
+                continue
 
-        if not release:
-            return None
+            artist_cred = [i["name"].lower() for i in release["artist-credit"]]
+            if not artist.lower() in artist_cred:
+                continue
 
-        album: AlbumType = {
-            "album_id": release["id"],
-            "name": release["title"],
-            "artist": artist,
-            "year": release["date"].split("-")[0],
-            "total_tracks": release["track-count"],
-            "cover_art": None,
-        }
+            album: AlbumType = {
+                "album_id": release["id"],
+                "name": release["title"],
+                "artist": artist,
+                "year": release["date"].split("-")[0],
+                "total_tracks": release["track-count"],
+                "cover_art": None,
+            }
+            return album
 
-        return album
+        return None
 
     def get_track_list(self, album: AlbumType) -> list[TrackType]:
         """get list of tracks in release"""
