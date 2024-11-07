@@ -37,3 +37,5 @@ main.py <playlist-id> | <url>
 This uses the free [musicbrainz.org](https://musicbrainz.org) API to validate and gather metadata information.
 
 When in doubt, you'll get prompted to manually enter the `Artist` name, the playlist title will become the Album, track title will be the video title, cover art will be the video thumbnail of the first video in the playlist.
+
+If there is no match on [musicbrainz.org](https://musicbrainz.org), the data from YT will be taken as is without trying to identify the tracks.

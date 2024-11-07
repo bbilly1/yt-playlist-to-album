@@ -69,11 +69,18 @@ class Tracks:
         audio["artist"] = track["album"].get("artist")
         audio["albumartist"] = track["album"].get("artist")
         audio["album"] = track["album"].get("name")
-        audio["date"] = track["album"].get("year")
         audio["tracknumber"] = f"{track_nr}/{total_tracks}"
-        audio["musicbrainz_trackid"] = track["track_id"]
-        audio["musicbrainz_albumid"] = track["album"].get("album_id")
         audio["website"] = f"https://www.youtube.com/watch?v={track['youtube_id']}"
+
+        if year := track["album"].get("year"):
+            audio["date"] = year
+
+        if track_id := track["track_id"]:
+            audio["musicbrainz_trackid"] = track_id
+
+        if album_id := track["album"].get("album_id"):
+            audio["musicbrainz_albumid"] = album_id
+
         audio.save()
 
         cover_handler = ID3(audio_path)

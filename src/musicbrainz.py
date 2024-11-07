@@ -21,16 +21,13 @@ class Brainz:
 
         return response.json()
 
-    def get_release_id(self, artist: str, album_name: str) -> AlbumType:
+    def get_release_id(self, artist: str, album_name: str) -> AlbumType | None:
         """get release id"""
         album = self._make_album_request(artist, album_name)
         if not album:
             artist = input("artist: ").strip()
 
         album = self._make_album_request(artist, album_name)
-
-        if not album:
-            raise ValueError("failed to id album")
 
         return album
 
