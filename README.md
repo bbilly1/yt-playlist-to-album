@@ -28,10 +28,15 @@ pip install --upgrade -r requirements.txt
 ```
 
 ## Run
-Pass the Playlist ID or URL with a `list` query parameter as a first argument to `main.py`, e.g.:
+Pass one of the following as a first argument to the `main.py` script to either download a single album or all available in bulk:
+
+- Playlist ID: `PLxxxxxxxxxxxx`
+- Playlist URL: `https://www.youtube.com/playlist?list=PLxxxxxxxxxxxx`
+- Channel Playlist Page: `https://www.youtube.com/@artist/playlists`
+- Channel Release Page: `https://www.youtube.com/@artist/releases`
 
 ```
-main.py <playlist-id> | <url>
+main.py <playlist-id> | <playlist-url> | <channel-playlist-page> | <channel-release-page>
 ```
 
 This uses the free [musicbrainz.org](https://musicbrainz.org) API to validate and gather metadata information.
