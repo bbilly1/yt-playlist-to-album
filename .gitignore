@@ -2,3 +2,5 @@ __pycache__
 .mypy_cache
 .venv
 .vscode
+
+config.json

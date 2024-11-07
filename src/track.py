@@ -1,5 +1,8 @@
 """download tracks"""
 
+from random import randrange
+from time import sleep
+
 import requests
 import yt_dlp
 from mutagen.easyid3 import EasyID3
@@ -10,7 +13,8 @@ from src.static_types import TrackType
 class Tracks:
     """represent album tracks"""
 
-    def __init__(self, track_list: list[TrackType]):
+    def __init__(self, track_list: list[TrackType], config: dict):
+        self.config = config
         self.track_list = track_list
         self.cover_art: bytes = bytes()
 
@@ -25,9 +29,16 @@ class Tracks:
         self.get_cover_art()
         for track in self.track_list:
             audio_path: str = self.download_single(track)
-            self.write_metadata(track, audio_path)
+            if audio_path:
+                self.write_metadata(track, audio_path)
 
-    def download_single(self, track: TrackType) -> str:
+            sleep_secs = self.config.get("sleep")
+            if sleep_secs:
+                sleep_rand = randrange(int(sleep_secs * 0.75), int(sleep_secs * 1.5))
+                print(f"sleep for: {sleep_rand}s")
+                sleep(sleep_rand)
+
+    def download_single(self, track: TrackType) -> str | None:
         """download single video"""
         artist = self._str_cleaner(track["album"]["artist"])
         album = self._str_cleaner(track["album"]["name"])
@@ -46,7 +57,15 @@ class Tracks:
                 "preferredquality": "192",
             }],
         }
-        yt_dlp.YoutubeDL(yt_obs).download(track.get("youtube_id"))
+        if yt_obs_append := self.config.get("yt_obs_append"):
+            print(f"append obs to yt-dlp: {yt_obs_append}")
+            yt_obs.update(yt_obs_append)
+
+        try:
+            yt_dlp.YoutubeDL(yt_obs).download(track.get("youtube_id"))
+        except yt_dlp.utils.DownloadError as err:
+            print(err)
+            return None
 
         return f"{template}.mp3"
 

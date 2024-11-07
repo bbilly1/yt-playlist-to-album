@@ -1,11 +1,25 @@
 """entry point"""
 
+import json
+import pathlib
 import sys
 from urllib.parse import parse_qs, urlparse
 
 import yt_dlp
 from src.album import Album
 from src.track import Tracks
+
+
+def read_config() -> dict:
+    """read config file"""
+    pwd = pathlib.Path(__file__).parent.resolve()
+    try:
+        with open(pwd / "config.json", "r", encoding="utf-8") as config_file:
+            config = json.loads(config_file.read())
+    except FileNotFoundError:
+        config = {}
+
+    return config
 
 
 def query_yt(url):
@@ -40,7 +54,8 @@ def get_playlist_ids(first_arg) -> list[str]:
 
 
 if __name__ == "__main__":
+    CONFIG = read_config()
     PLAYLIST_IDS = get_playlist_ids(sys.argv[1])
     for PLAYLIST_ID in PLAYLIST_IDS:
         TRACK_LIST = Album(PLAYLIST_ID).get_tracklist()
-        Tracks(TRACK_LIST).download_tracks()
+        Tracks(TRACK_LIST, config=CONFIG).download_tracks()
